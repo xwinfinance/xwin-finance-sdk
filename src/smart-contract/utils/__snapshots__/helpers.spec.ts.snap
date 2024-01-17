@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getFastGasFee resolves as expected by { chainId: 10 } 1`] = `
+{
+  "gasPrice": "3000000000",
+}
+`;
+
+exports[`getFastGasFee resolves as expected by { chainId: 56 } 1`] = `
+{
+  "gasPrice": "3000000000",
+}
+`;
+
+exports[`getFastGasFee resolves as expected by { chainId: 97 } 1`] = `
+{
+  "gasPrice": "10000000000",
+}
+`;
+
+exports[`getFastGasFee resolves as expected by { chainId: 31337 } 1`] = `
+{
+  "gasPrice": "100000000",
+}
+`;
+
+exports[`getFastGasFee resolves as expected by { chainId: 42161 } 1`] = `
+{
+  "gasPrice": "100000000",
+}
+`;
+
+exports[`getJsonRpcProvider resolves as expected - Binance 1`] = `
+{
+  "chainId": 56,
+  "provider": JsonRpcProvider {},
+}
+`;
+
+exports[`getJsonRpcProvider resolves as expected - arbitrum 1`] = `
+{
+  "chainId": 42161,
+  "provider": JsonRpcProvider {},
+}
+`;
+
+exports[`getJsonRpcProvider resolves as expected - polygon 1`] = `
+{
+  "chainId": 137,
+  "provider": JsonRpcProvider {},
+}
+`;

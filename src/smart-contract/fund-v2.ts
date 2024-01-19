@@ -5,7 +5,7 @@ import {convertSlippage, getFastGasFee, getJsonRpcProvider} from './utils/helper
 export class FundV2 {
   constructor(private readonly rpcNodeUrl: string) {}
 
-  async getDecimalByContractAddress({
+  async getBaseTokenDecimal({
     contractAddress,
     provider,
   }: {
@@ -19,9 +19,11 @@ export class FundV2 {
       provider = jsonRpcProvider.provider;
     }
 
-    const contract = new ethers.Contract(contractAddress, fundV2Abi, provider);
+    const contractFundv2 = new ethers.Contract(contractAddress, fundV2Abi, provider);
+    const baseCcy = await contractFundv2.baseToken();
 
-    return contract.decimals();
+    const contract = new ethers.Contract(baseCcy, fundV2Abi, provider);
+    return await contract.decimals();
   }
 
   async deposit({
@@ -41,7 +43,7 @@ export class FundV2 {
         privateKey,
       });
 
-      const decimal = await this.getDecimalByContractAddress({provider, contractAddress});
+      const decimal = await this.getBaseTokenDecimal({provider, contractAddress});
       const amountToUse = ethers.parseUnits(String(amount), String(decimal)).toString();
       slippage = convertSlippage(slippage);
 
@@ -79,8 +81,7 @@ export class FundV2 {
         privateKey,
       });
 
-      const decimal = await this.getDecimalByContractAddress({provider, contractAddress});
-      const amountToUse = ethers.parseUnits(String(amount), String(decimal)).toString();
+      const amountToUse = ethers.parseUnits(String(amount), 18).toString();
       slippage = convertSlippage(slippage);
 
       const contract = new ethers.Contract(contractAddress, fundV2Abi, signer);
@@ -123,21 +124,37 @@ export class FundV2 {
 
       const contract = new ethers.Contract(contractAddress, fundV2Abi, signer);
 
-      const params = getFastGasFee(chainId);
-      const transaction = await contract['Rebalance(address[],uint256[],uint32)'](
-        toAddress,
-        targets,
-        slippage,
-        {
-          ...params,
-        },
-      );
-      const receipt = await transaction.wait();
+      const isNoFundUnit = await contract.getFundTotalSupply();
 
-      return {
-        transaction,
-        receipt,
-      };
+      const params = getFastGasFee(chainId);
+      if(isNoFundUnit > 0){
+        const transaction = await contract['Rebalance(address[],uint256[],uint32)'](
+          toAddress,
+          targets,
+          slippage,
+          {
+            ...params,
+          },
+        );
+        const receipt = await transaction.wait();
+        return {
+          transaction,
+          receipt,
+        };
+      }else{
+        const transaction = await contract['createTargetNames(address[],uint256[])'](
+          toAddress,
+          targets,
+          {
+            ...params,
+          },
+        );
+        const receipt = await transaction.wait();
+        return {
+          transaction,
+          receipt,
+        };
+      }
     } catch (e) {
       throw e;
     }

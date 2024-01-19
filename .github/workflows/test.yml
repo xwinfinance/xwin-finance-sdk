@@ -13,18 +13,15 @@ jobs:
 
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js v18.13.0
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: v18.13.0
 
       - name: Install 🔧
         run: npm install
-
-      # - name: LINT 👀
-      #   run: npm run lint
 
       - name: Test 🚨
         run: npm run test

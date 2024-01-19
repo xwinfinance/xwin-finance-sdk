@@ -18,3 +18,8 @@ const response = await new SmartContractSdk.FundV2(
   slippage: 100,
 });
 ```
+
+
+## Docs
+please refer to the docs for more references
+- [types docs](https://download.xwin.finance/docs/@xwin-finance/sdk/latest/index.html)

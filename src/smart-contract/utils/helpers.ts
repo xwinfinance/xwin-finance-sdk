@@ -84,3 +84,12 @@ export const getFastGasFee = async (chainId: Number): Promise<IGasFee> => {
     gasPrice: convertToWei(3),
   };
 };
+
+export const convertSlippage = (slippage: number): number => {
+  const output = slippage * 100;
+  if (output > 100) {
+    throw new Error('Slippage value must be not greater than 1');
+  }
+
+  return output;
+};

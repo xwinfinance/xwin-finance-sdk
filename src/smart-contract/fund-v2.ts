@@ -1,9 +1,13 @@
 import {JsonRpcProvider, ethers} from 'ethers';
-import * as fundV2Abi from './abi/fundV2.json';
+import * as fs from 'fs';
 import {convertSlippage, getFastGasFee, getJsonRpcProvider} from './utils/helpers';
 
 export class FundV2 {
   constructor(private readonly rpcNodeUrl: string) {}
+
+  async abi(): Promise<string> {
+    return fs.readFileSync('./abi/fundV2.json', 'utf-8');
+  }
 
   async getBaseTokenDecimal({
     contractAddress,
@@ -19,11 +23,12 @@ export class FundV2 {
       provider = jsonRpcProvider.provider;
     }
 
+    const fundV2Abi = await this.abi();
     const contractFundv2 = new ethers.Contract(contractAddress, fundV2Abi, provider);
     const baseCcy = await contractFundv2.baseToken();
 
     const contract = new ethers.Contract(baseCcy, fundV2Abi, provider);
-    return await contract.decimals();
+    return contract.decimals();
   }
 
   async deposit({
@@ -47,6 +52,7 @@ export class FundV2 {
       const amountToUse = ethers.parseUnits(String(amount), String(decimal)).toString();
       slippage = convertSlippage(slippage);
 
+      const fundV2Abi = await this.abi();
       const contract = new ethers.Contract(contractAddress, fundV2Abi, signer);
 
       const params = getFastGasFee(chainId);
@@ -84,6 +90,7 @@ export class FundV2 {
       const amountToUse = ethers.parseUnits(String(amount), 18).toString();
       slippage = convertSlippage(slippage);
 
+      const fundV2Abi = await this.abi();
       const contract = new ethers.Contract(contractAddress, fundV2Abi, signer);
 
       const params = getFastGasFee(chainId);
@@ -121,13 +128,13 @@ export class FundV2 {
       });
 
       slippage = convertSlippage(slippage);
-
+      const fundV2Abi = await this.abi();
       const contract = new ethers.Contract(contractAddress, fundV2Abi, signer);
 
       const isNoFundUnit = await contract.getFundTotalSupply();
 
       const params = getFastGasFee(chainId);
-      if(isNoFundUnit > 0){
+      if (isNoFundUnit > 0) {
         const transaction = await contract['Rebalance(address[],uint256[],uint32)'](
           toAddress,
           targets,
@@ -141,7 +148,7 @@ export class FundV2 {
           transaction,
           receipt,
         };
-      }else{
+      } else {
         const transaction = await contract['createTargetNames(address[],uint256[])'](
           toAddress,
           targets,

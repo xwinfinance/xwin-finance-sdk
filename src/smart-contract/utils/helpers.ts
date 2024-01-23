@@ -1,39 +1,11 @@
-import {JsonRpcProvider, Wallet, ethers} from 'ethers';
-import {IGasFee} from './interfaces';
-
-export const getJsonRpcProvider = async ({
-  rpcNodeUrl,
-  privateKey,
-}: {
-  rpcNodeUrl: string;
-  privateKey?: string;
-}): Promise<{
-  provider: JsonRpcProvider;
-  chainId: Number;
-  signer?: Wallet;
-}> => {
-  const provider = new JsonRpcProvider(rpcNodeUrl);
-  const chainId = Number((await provider.getNetwork()).chainId);
-
-  if (!privateKey) {
-    return {
-      provider,
-      chainId,
-    };
-  }
-
-  return {
-    provider,
-    chainId,
-    signer: new Wallet(privateKey, provider),
-  };
-};
+import {ethers} from 'ethers';
+import {GasFee} from './types';
 
 export const convertToWei = (val: number): string => {
   return ethers.parseUnits(val.toString(), 'gwei').toString();
 };
 
-export const getFastGasFee = async (chainId: Number): Promise<IGasFee> => {
+export const getFastGasFee = async (chainId: Number): Promise<GasFee> => {
   // Polygon Mainnet
   if (chainId === 137) {
     const gasData = await (await fetch('https://gasstation.polygon.technology/v2')).json();

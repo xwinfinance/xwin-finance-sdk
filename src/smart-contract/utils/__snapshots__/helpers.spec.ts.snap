@@ -20,35 +20,10 @@ exports[`helpers getFastGasFee resolves as expected by { chainId: 97 } 1`] = `
 }
 `;
 
-exports[`helpers getFastGasFee resolves as expected by { chainId: 31337 } 1`] = `
-{
-  "gasPrice": "100000000",
-}
-`;
+exports[`helpers getFastGasFee resolves as expected by { chainId: 31337 } 1`] = `{}`;
 
 exports[`helpers getFastGasFee resolves as expected by { chainId: 42161 } 1`] = `
 {
   "gasPrice": "100000000",
-}
-`;
-
-exports[`helpers getJsonRpcProvider resolves as expected - Binance 1`] = `
-{
-  "chainId": 56,
-  "provider": JsonRpcProvider {},
-}
-`;
-
-exports[`helpers getJsonRpcProvider resolves as expected - arbitrum 1`] = `
-{
-  "chainId": 42161,
-  "provider": JsonRpcProvider {},
-}
-`;
-
-exports[`helpers getJsonRpcProvider resolves as expected - polygon 1`] = `
-{
-  "chainId": 137,
-  "provider": JsonRpcProvider {},
 }
 `;

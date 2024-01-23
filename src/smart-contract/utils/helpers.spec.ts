@@ -1,44 +1,6 @@
-import {convertSlippage, convertToWei, getFastGasFee, getJsonRpcProvider} from './helpers';
+import {convertSlippage, convertToWei, getFastGasFee} from './helpers';
 
 describe('helpers', () => {
-  describe('getJsonRpcProvider', () => {
-    it('resolves as expected - Binance', async () => {
-      // Pre
-
-      // Action
-      const output = await getJsonRpcProvider({
-        rpcNodeUrl: 'https://bsc-dataseed1.binance.org',
-      });
-      // Assert
-
-      expect(output).toMatchSnapshot();
-    });
-
-    it('resolves as expected - polygon', async () => {
-      // Pre
-
-      // Action
-      const output = await getJsonRpcProvider({
-        rpcNodeUrl: 'https://polygon-rpc.com',
-      });
-      // Assert
-
-      expect(output).toMatchSnapshot();
-    });
-
-    it('resolves as expected - arbitrum', async () => {
-      // Pre
-
-      // Action
-      const output = await getJsonRpcProvider({
-        rpcNodeUrl: 'https://arbitrum-one.publicnode.com',
-      });
-      // Assert
-
-      expect(output).toMatchSnapshot();
-    });
-  });
-
   describe('convertToWei', () => {
     it('resolves as expected', () => {
       // Pre

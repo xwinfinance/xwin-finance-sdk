@@ -1,5 +1,5 @@
-export interface IGasFee {
+export type GasFee = {
   gasPrice?: string;
   maxFeePerGas?: string;
   maxPriorityFeePerGas?: string;
-}
+};

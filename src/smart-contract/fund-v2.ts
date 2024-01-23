@@ -28,7 +28,8 @@ export class FundV2 {
     const baseCcy = await contractFundv2.baseToken();
 
     const contract = new ethers.Contract(baseCcy, fundV2Abi, provider);
-    return contract.decimals();
+
+    return Number(await contract.decimals());
   }
 
   async deposit({
@@ -49,14 +50,16 @@ export class FundV2 {
       });
 
       const decimal = await this.getBaseTokenDecimal({provider, contractAddress});
-      const amountToUse = ethers.parseUnits(String(amount), String(decimal)).toString();
-      slippage = convertSlippage(slippage);
 
       const fundV2Abi = await this.abi();
+
+      const amountToUse = ethers.parseUnits(String(amount), decimal);
+      slippage = convertSlippage(slippage);
+
       const contract = new ethers.Contract(contractAddress, fundV2Abi, signer);
 
-      const params = getFastGasFee(chainId);
-      const transaction = await contract['deposit(uint256,uint32)'](amountToUse, slippage, {
+      const params = await getFastGasFee(chainId);
+      const transaction = await contract['deposit(uint256,uint32)'](String(amountToUse), slippage, {
         ...params,
       });
       const receipt = await transaction.wait();
@@ -66,6 +69,7 @@ export class FundV2 {
         receipt,
       };
     } catch (e) {
+      console.log('error', e);
       throw e;
     }
   }
@@ -82,7 +86,7 @@ export class FundV2 {
     slippage: number;
   }): Promise<Record<string, unknown>> {
     try {
-      const {provider, signer, chainId} = await getJsonRpcProvider({
+      const {signer, chainId} = await getJsonRpcProvider({
         rpcNodeUrl: this.rpcNodeUrl,
         privateKey,
       });
@@ -93,7 +97,7 @@ export class FundV2 {
       const fundV2Abi = await this.abi();
       const contract = new ethers.Contract(contractAddress, fundV2Abi, signer);
 
-      const params = getFastGasFee(chainId);
+      const params = await getFastGasFee(chainId);
       const transaction = await contract['withdraw(uint256,uint32)'](amountToUse, slippage, {
         ...params,
       });
@@ -104,6 +108,7 @@ export class FundV2 {
         receipt,
       };
     } catch (e) {
+      console.log('error', e);
       throw e;
     }
   }
@@ -133,7 +138,7 @@ export class FundV2 {
 
       const isNoFundUnit = await contract.getFundTotalSupply();
 
-      const params = getFastGasFee(chainId);
+      const params = await getFastGasFee(chainId);
       if (isNoFundUnit > 0) {
         const transaction = await contract['Rebalance(address[],uint256[],uint32)'](
           toAddress,
@@ -163,6 +168,7 @@ export class FundV2 {
         };
       }
     } catch (e) {
+      console.log('error', e);
       throw e;
     }
   }

@@ -34,16 +34,9 @@ export const convertToWei = (val: number): string => {
 };
 
 export const getFastGasFee = async (chainId: Number): Promise<IGasFee> => {
-  // BNB Smart Chain Mainnet
-  if (chainId === 56) {
-    return {
-      gasPrice: convertToWei(3),
-    };
-  }
-
   // Polygon Mainnet
   if (chainId === 137) {
-    const gasData = await (await fetch('https://gasstation-mainnet.matic.network/v2')).json();
+    const gasData = await (await fetch('https://gasstation.polygon.technology/v2')).json();
     return {
       maxFeePerGas: convertToWei(gasData.fast.maxFee.toFixed(6)),
       maxPriorityFeePerGas: convertToWei(gasData.fast.maxPriorityFee.toFixed(6)),
@@ -52,10 +45,17 @@ export const getFastGasFee = async (chainId: Number): Promise<IGasFee> => {
 
   // Mumbai - Testnet
   if (chainId === 80001) {
-    const gasData = await (await fetch('https://gasstation-mumbai.matic.today/v2')).json();
+    const gasData = await (await fetch('https://gasstation-testnet.polygon.technology/v2')).json();
     return {
       maxFeePerGas: convertToWei(gasData.fast.maxFee.toFixed(6)),
       maxPriorityFeePerGas: convertToWei(gasData.fast.maxPriorityFee.toFixed(6)),
+    };
+  }
+
+  // BNB Smart Chain Mainnet
+  if (chainId === 56) {
+    return {
+      gasPrice: convertToWei(3),
     };
   }
 
@@ -66,11 +66,9 @@ export const getFastGasFee = async (chainId: Number): Promise<IGasFee> => {
     };
   }
 
-  // GoChain Testnet
+  // GoChain Testnet (LOCALHOST)
   if (chainId === 31337) {
-    return {
-      gasPrice: convertToWei(0.1),
-    };
+    return {};
   }
 
   // Arbitrum One

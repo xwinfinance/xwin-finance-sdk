@@ -1,5 +1,7 @@
 import {ethers} from 'ethers';
 import * as fs from 'fs';
+import * as path from 'path';
+
 import {Logger} from '../helpers/logger/pino';
 import {SmartContractSdkCore} from './core/core';
 import {convertSlippage, getFastGasFee} from './utils/helpers';
@@ -11,7 +13,8 @@ export class FundV2 {
    * function to get abi file
    */
   async abi(): Promise<string> {
-    return fs.readFileSync('./abi/fundV2.json', 'utf-8');
+    const filePath = path.join(__dirname, './abi/fundV2.json');
+    return fs.readFileSync(filePath, 'utf-8');
   }
 
   /**

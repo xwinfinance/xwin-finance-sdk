@@ -11,7 +11,8 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src/smart-contract/abi/*.json"
   ],
   "keywords": [
     "xwin-finance/sdk"

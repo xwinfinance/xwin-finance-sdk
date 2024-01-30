@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsup && copyfiles -u 1 abi/*.json dist/abi",
     "build:docs": "typedoc --options typedoc.json --out public",
-    "test": "jest --bail --forceExit --runInBand --verbose=false --logHeapUsage --detectOpenHandles"
+    "test": "jest --bail --forceExit --runInBand --verbose=false --logHeapUsage --detectOpenHandles",
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -30,7 +31,9 @@
   "devDependencies": {
     "@types/jest": "^29.5.11",
     "copyfiles": "^2.4.1",
+    "eslint-config-prettier": "^9.1.0",
     "jest": "^29.7.0",
+    "prettier": "^3.2.4",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",

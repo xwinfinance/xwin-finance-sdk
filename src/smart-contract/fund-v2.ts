@@ -7,12 +7,12 @@ import {SmartContractSdkCore} from './core/core';
 import {convertSlippage, getFastGasFee, priceMaster} from './utils/helpers';
 
 export interface WeightsData {
-  targetTokenAddress : String;
-  targetWeights : Number;
-  currentWeights : Number;
-  activeWeights : Number;
-  tokenBalance : Number;
-  tokenPrice : Number;
+  targetTokenAddress: String;
+  targetWeights: Number;
+  currentWeights: Number;
+  activeWeights: Number;
+  tokenBalance: Number;
+  tokenPrice: Number;
 }
 export class FundV2 {
   constructor(private readonly sdkCore: SmartContractSdkCore) {}
@@ -21,53 +21,47 @@ export class FundV2 {
    * function to get abi file
    */
   async abi(): Promise<string> {
-    const filePath = path.join(__dirname, './abi/fundV2.json');
-    return fs.readFileSync(filePath, 'utf-8');
+    return fs.readFileSync(path.join(__dirname, './abi/fundV2.json'), 'utf-8');
   }
 
-
-    /**
+  /**
    * function to read fund active weights
    *
    * @param {Object} param the contract address to deposit.
    * @returns 3 seperate arrays of target weights, current weights, and active weights
    */
-    async getFundWeightsData({
-      contractAddress,
-    }: {
-      contractAddress: string;
-    }): Promise<WeightsData[]> {
-      try {
-        const fundV2Abi = await this.abi();
-        const priceMasterContract = await priceMaster(this.sdkCore.chainId);
-        const contract = new ethers.Contract(contractAddress, fundV2Abi, this.sdkCore.signer);
-        const baseTokenAddr = await contract.baseToken();
-        const vaultValue = await contract.getVaultValues();
-        const targetAddr = await contract.targetAddr();
-        const weights :WeightsData[] = [];
+  async getFundWeightsData({contractAddress}: {contractAddress: string}): Promise<WeightsData[]> {
+    try {
+      const fundV2Abi = await this.abi();
+      const priceMasterContract = await priceMaster(this.sdkCore.chainId);
+      const contract = new ethers.Contract(contractAddress, fundV2Abi, this.sdkCore.signer);
+      const baseTokenAddr = await contract.baseToken();
+      const vaultValue = await contract.getVaultValues();
+      const targetAddr = await contract.targetAddr();
+      const weights: WeightsData[] = [];
 
-        for(let addr in targetAddr) {
-          let target = await contract.TargetWeight(addr);
-          let balance = await contract.getBalance(addr);
-          let price = await priceMasterContract.getPrice(addr, baseTokenAddr);
-          let current = (balance * price) / vaultValue;
+      for (let addr in targetAddr) {
+        let target = await contract.TargetWeight(addr);
+        let balance = await contract.getBalance(addr);
+        let price = await priceMasterContract.getPrice(addr, baseTokenAddr);
+        let current = (balance * price) / vaultValue;
 
-          let data : WeightsData = {
-            targetTokenAddress: addr,
-            targetWeights: target,
-            currentWeights: current,
-            activeWeights: current - target,
-            tokenBalance: balance,
-            tokenPrice: price,
-          }
-          weights.push(data);
-        }
-        return weights;
-      } catch (e) {
-        Logger.error({error: e, name: FundV2.name}, 'Read error');
-        throw e;
+        let data: WeightsData = {
+          targetTokenAddress: addr,
+          targetWeights: target,
+          currentWeights: current,
+          activeWeights: current - target,
+          tokenBalance: balance,
+          tokenPrice: price,
+        };
+        weights.push(data);
       }
+      return weights;
+    } catch (e) {
+      Logger.error({error: e, name: FundV2.name}, 'Read error');
+      throw e;
     }
+  }
   /**
    * function to get base token decimal
    *

@@ -1,7 +1,7 @@
 import {ethers} from 'ethers';
-import {GasFee} from './types';
 import * as fs from 'fs';
-
+import * as path from 'path';
+import {GasFee} from './types';
 
 export const convertToWei = (val: number): string => {
   return ethers.parseUnits(val.toString(), 'gwei').toString();
@@ -67,7 +67,7 @@ export const convertSlippage = (slippage: number): number => {
 };
 
 export const priceMaster = async (chainId: Number): Promise<ethers.Contract> => {
-  const abi = fs.readFileSync('./abi/priceMaster.json', 'utf-8');
+  const abi = await fs.readFileSync(path.join(__dirname, './abi/priceMaster.json'), 'utf-8');
 
   // Polygon Mainnet
   if (chainId === 137) {
@@ -85,4 +85,4 @@ export const priceMaster = async (chainId: Number): Promise<ethers.Contract> => 
   }
 
   throw new Error('Unsupported chain id: ' + chainId);
-}
+};

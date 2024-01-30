@@ -1,6 +1,6 @@
-import {ethers} from 'ethers';
-import {GasFee} from './types';
+import { ethers } from 'ethers';
 import * as fs from 'fs';
+import { GasFee } from './types';
 
 
 export const convertToWei = (val: number): string => {

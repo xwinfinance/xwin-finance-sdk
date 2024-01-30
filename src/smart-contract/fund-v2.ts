@@ -1,16 +1,18 @@
-import {ethers} from 'ethers';
+import { ethers } from 'ethers';
 import * as fs from 'fs';
-import {Logger} from '../helpers/logger/pino';
-import {SmartContractSdkCore} from './core/core';
-import {convertSlippage, getFastGasFee, priceMaster} from './utils/helpers';
+import * as path from 'path';
+
+import { Logger } from '../helpers/logger/pino';
+import { SmartContractSdkCore } from './core/core';
+import { convertSlippage, getFastGasFee, priceMaster } from './utils/helpers';
 
 export interface WeightsData {
-  targetTokenAddress : String;
-  targetWeights : Number;
-  currentWeights : Number;
-  activeWeights : Number;
-  tokenBalance : Number;
-  tokenPrice : Number;
+  targetTokenAddress: String;
+  targetWeights: Number;
+  currentWeights: Number;
+  activeWeights: Number;
+  tokenBalance: Number;
+  tokenPrice: Number;
 }
 export class FundV2 {
   constructor(private readonly sdkCore: SmartContractSdkCore) {}
@@ -19,7 +21,7 @@ export class FundV2 {
    * function to get abi file
    */
   async abi(): Promise<string> {
-    return fs.readFileSync('./abi/fundV2.json', 'utf-8');
+    return fs.readFileSync(path.join(__dirname, './abi/fundV2.json'), 'utf-8');
   }
 
 
@@ -60,6 +62,7 @@ export class FundV2 {
         throw e;
       }
     }
+
   /**
    * function to get base token decimal
    *

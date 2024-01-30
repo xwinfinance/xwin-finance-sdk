@@ -29,31 +29,26 @@ export class FundV2 {
    * @param {Object} param the contract address to deposit.
    * @returns 3 seperate arrays of target weights, current weights, and active weights
    */
-    async getFundWeightsData({
-      contractAddress,
-    }: {
-      contractAddress: string;
-    }): Promise<WeightsData[]> {
+    async getFundWeightsData(contractAddress: string): Promise<WeightsData[]> {
       try {
         const fundV2Abi = await this.abi();
-        const priceMasterContract = await priceMaster(this.sdkCore.chainId);
+        const priceMasterContract = await priceMaster(this.sdkCore.chainId, this.sdkCore.signer);
         const contract = new ethers.Contract(contractAddress, fundV2Abi, this.sdkCore.signer);
         const baseTokenAddr = await contract.baseToken();
         const vaultValue = await contract.getVaultValues();
-        const targetAddr = await contract.targetAddr();
+        const targetAddr:string[] = await contract.getTargetNamesAddress();
         const weights :WeightsData[] = [];
-
-        for(let addr in targetAddr) {
-          let target = await contract.TargetWeight(addr);
-          let balance = await contract.getBalance(addr);
-          let price = await priceMasterContract.getPrice(addr, baseTokenAddr);
-          let current = (balance * price) / vaultValue;
+        for(let i=0; i < targetAddr.length; i++) {
+          let target = await contract.TargetWeight(targetAddr[i]);
+          let balance = await contract.getBalance(targetAddr[i]);
+          let price = await priceMasterContract.getPrice(targetAddr[i], baseTokenAddr);
+          let current = parseFloat(ethers.formatEther((balance * price) / vaultValue)) * 10000;
 
           let data : WeightsData = {
-            targetTokenAddress: addr,
+            targetTokenAddress: targetAddr[i],
             targetWeights: target,
-            currentWeights: current,
-            activeWeights: current - target,
+            currentWeights: Math.round(current),
+            activeWeights: Math.round(current) - Number(target),
             tokenBalance: balance,
             tokenPrice: price,
           }

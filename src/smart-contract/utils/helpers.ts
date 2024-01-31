@@ -1,5 +1,7 @@
 import {ethers} from 'ethers';
 import * as fs from 'fs';
+import * as path from 'path';
+
 import {GasFee} from './types';
 
 export const convertToWei = (val: number): string => {
@@ -69,7 +71,7 @@ export const priceMaster = async (
   chainId: Number,
   signer: ethers.Wallet,
 ): Promise<ethers.Contract> => {
-  const abi = fs.readFileSync('./abi/priceMaster.json', 'utf-8');
+  const abi = await fs.readFileSync(path.join(__dirname, './abi/priceMaster.json'), 'utf-8');
 
   // Polygon Mainnet
   if (chainId === 137) {

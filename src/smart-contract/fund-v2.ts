@@ -39,16 +39,16 @@ export class FundV2 {
       const stableCoinDecimals = await this.getTokenDecimal(stableCoinAddr);
       const vaultValue = await contract.getVaultValues();
       const targetAddr: string[] = await contract.getTargetNamesAddress();
-      const weights: WeightsData[] = [];
-      await Promise.all(
-        targetAddr.map(async (addr) => {
-          let target = await contract.TargetWeight(addr);
-          let balance = await contract.getBalance(addr);
-          let price = await priceMasterContract.getPrice(addr, stableCoinAddr);
-          let current = parseFloat(ethers.formatEther((balance * price) / vaultValue));
-          let tokenDecimal = await this.getTokenDecimal(addr);
 
-          let data: WeightsData = {
+      return Promise.all(
+        targetAddr.map(async (addr) => {
+          const target = await contract.TargetWeight(addr);
+          const balance = await contract.getBalance(addr);
+          const price = await priceMasterContract.getPrice(addr, stableCoinAddr);
+          const current = parseFloat(ethers.formatEther((balance * price) / vaultValue));
+          const tokenDecimal = await this.getTokenDecimal(addr);
+
+          return {
             targetTokenAddress: addr,
             targetWeights: Number(target) / 10000,
             currentWeights: current,
@@ -56,10 +56,8 @@ export class FundV2 {
             tokenBalance: parseFloat(ethers.formatUnits(balance, tokenDecimal)),
             tokenPrice: parseFloat(ethers.formatUnits(price, stableCoinDecimals)),
           };
-          weights.push(data);
         }),
       );
-      return weights;
     } catch (e) {
       Logger.error({error: e, name: FundV2.name}, 'Read error');
       throw e;

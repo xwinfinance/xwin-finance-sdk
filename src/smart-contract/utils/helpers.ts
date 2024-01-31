@@ -71,7 +71,7 @@ export const priceMaster = async (
   chainId: Number,
   signer: ethers.Wallet,
 ): Promise<ethers.Contract> => {
-  const abi = await fs.readFileSync(path.join(__dirname, './abi/priceMaster.json'), 'utf-8');
+  const abi = fs.readFileSync(path.join(__dirname, './abi/priceMaster.json'), 'utf-8');
 
   // Polygon Mainnet
   if (chainId === 137) {

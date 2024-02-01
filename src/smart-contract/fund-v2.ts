@@ -4,8 +4,16 @@ import * as path from 'path';
 
 import {Logger} from '../helpers/logger/pino';
 import {SmartContractSdkCore} from './core/core';
-import {convertSlippage, getFastGasFee} from './utils/helpers';
+import {convertSlippage, getFastGasFee, priceMaster} from './utils/helpers';
 
+export interface WeightsData {
+  targetTokenAddress: String;
+  targetWeights: Number;
+  currentWeights: Number;
+  activeWeights: Number;
+  tokenBalance: Number;
+  tokenPrice: Number;
+}
 export class FundV2 {
   constructor(private readonly sdkCore: SmartContractSdkCore) {}
 
@@ -13,8 +21,60 @@ export class FundV2 {
    * function to get abi file
    */
   async abi(): Promise<string> {
-    const filePath = path.join(__dirname, './abi/fundV2.json');
-    return fs.readFileSync(filePath, 'utf-8');
+    return fs.readFileSync(path.join(__dirname, './abi/fundV2.json'), 'utf-8');
+  }
+
+  /**
+   * function to read fund active weights
+   *
+   * @param {Object} param the contract address to deposit.
+   * @returns 3 seperate arrays of target weights, current weights, and active weights
+   */
+  async getFundWeightsData(contractAddress: string): Promise<WeightsData[]> {
+    try {
+      const fundV2Abi = await this.abi();
+      const priceMasterContract = await priceMaster(this.sdkCore.chainId, this.sdkCore.signer);
+      const contract = new ethers.Contract(contractAddress, fundV2Abi, this.sdkCore.signer);
+      const baseTokenAddr = await contract.baseToken();
+      const baseTokenDecimal = await this.getTokenDecimal(baseTokenAddr);
+      const vaultValue = await contract.getVaultValues();
+      const targetAddr: string[] = await contract.getTargetNamesAddress();
+
+      return Promise.all(
+        targetAddr.map(async (addr) => {
+          const target = await contract.TargetWeight(addr);
+          const balance = await contract.getBalance(addr);
+          const tokenValue = await contract.getTokenValues(addr);
+          const price = await priceMasterContract.getPrice(addr, baseTokenAddr);
+          const current = Number(tokenValue) / Number(vaultValue);
+          const tokenDecimal = await this.getTokenDecimal(addr);
+
+          return {
+            targetTokenAddress: addr,
+            targetWeights: Number(target) / 10000,
+            currentWeights: current,
+            activeWeights: current - Number(target) / 10000,
+            tokenBalance: parseFloat(ethers.formatUnits(balance, tokenDecimal)),
+            tokenPrice: parseFloat(ethers.formatUnits(price, baseTokenDecimal)),
+          };
+        }),
+      );
+    } catch (e) {
+      Logger.error({error: e, name: FundV2.name}, 'getFundWeightsData error');
+      throw e;
+    }
+  }
+
+  /**
+   * function to get token decimal
+   *
+   * @param contractAddress the contract address to get.
+   * @returns the number of decimal for the particular contract address.
+   */
+  async getTokenDecimal(contractAddress: string): Promise<number> {
+    const fundV2Abi = await this.abi();
+    const contract = new ethers.Contract(contractAddress, fundV2Abi, this.sdkCore.provider);
+    return Number(await contract.decimals());
   }
 
   /**

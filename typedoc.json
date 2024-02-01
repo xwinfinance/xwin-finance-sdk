@@ -1,0 +1,9 @@
+{
+	"$schema": "https://typedoc.org/schema.json",
+	"out": "doc",
+	"entryPoints": [
+		"./src/index.ts",
+		"./src/smart-contract/utils/helpers.ts",
+		"./src/smart-contract/fund-v2.ts",
+	],
+}

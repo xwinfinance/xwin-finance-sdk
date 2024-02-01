@@ -60,7 +60,7 @@ export class FundV2 {
         }),
       );
     } catch (e) {
-      Logger.error({error: e, name: FundV2.name}, 'Read error');
+      Logger.error({error: e, name: FundV2.name}, 'getFundWeightsData error');
       throw e;
     }
   }

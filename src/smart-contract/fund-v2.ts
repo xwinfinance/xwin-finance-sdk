@@ -33,8 +33,8 @@ export class FundV2 {
   async getFundWeightsData(contractAddress: string): Promise<WeightsData[]> {
     try {
       const fundV2Abi = await this.abi();
-      const priceMasterContract = await priceMaster(this.sdkCore.chainId, this.sdkCore.signer);
-      const contract = new ethers.Contract(contractAddress, fundV2Abi, this.sdkCore.signer);
+      const priceMasterContract = await priceMaster(this.sdkCore.chainId, this.sdkCore.provider);
+      const contract = new ethers.Contract(contractAddress, fundV2Abi, this.sdkCore.provider);
       const baseTokenAddr = await contract.baseToken();
       const baseTokenDecimal = await this.getTokenDecimal(baseTokenAddr);
       const vaultValue = await contract.getVaultValues();

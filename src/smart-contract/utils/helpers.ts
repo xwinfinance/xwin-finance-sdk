@@ -69,23 +69,23 @@ export const convertSlippage = (slippage: number): number => {
 
 export const priceMaster = async (
   chainId: Number,
-  signer: ethers.Wallet,
+  provider: ethers.JsonRpcProvider,
 ): Promise<ethers.Contract> => {
   const abi = fs.readFileSync(path.join(__dirname, './abi/priceMaster.json'), 'utf-8');
 
   // Polygon Mainnet
   if (chainId === 137) {
-    return new ethers.Contract('0x4259ED91681159E455629a35d81c0b0020e3FeeD', abi, signer);
+    return new ethers.Contract('0x4259ED91681159E455629a35d81c0b0020e3FeeD', abi, provider);
   }
 
   // BNB Smart Chain Mainnet
   if (chainId === 56) {
-    return new ethers.Contract('0xB1233713FeA0984fff84c7456d2cCed43e5e48E2', abi, signer);
+    return new ethers.Contract('0xB1233713FeA0984fff84c7456d2cCed43e5e48E2', abi, provider);
   }
 
   // Arbitrum One
   if (chainId === 42161) {
-    return new ethers.Contract('0x8a3c24716447992C85a86231606759931f83c667', abi, signer);
+    return new ethers.Contract('0x8a3c24716447992C85a86231606759931f83c667', abi, provider);
   }
 
   throw new Error('Unsupported chain id: ' + chainId);

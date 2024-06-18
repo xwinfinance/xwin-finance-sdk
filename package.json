@@ -1,6 +1,6 @@
 {
   "name": "@xwin-finance/sdk",
-  "version": "1.0.202403111234",
+  "version": "1.0.202406181830",
   "description": "A common SDK library from xwin-finance",
   "scripts": {
     "build": "tsup && copyfiles -u 1 abi/*.json dist/abi",

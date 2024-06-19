@@ -1,5 +1,6 @@
 import {JsonRpcProvider, Wallet} from 'ethers';
 import {Logger} from '../../helpers/logger/pino';
+import {BEP20} from '../bep20';
 import {FundV2} from '../fund-v2';
 import {SmartContractSdkConfig} from './core.type';
 
@@ -35,5 +36,9 @@ export class SmartContractSdkCore {
 
   FundV2(): FundV2 {
     return new FundV2(this);
+  }
+
+  BEP20(): BEP20 {
+    return new BEP20(this);
   }
 }

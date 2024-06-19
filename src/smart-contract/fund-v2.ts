@@ -1,8 +1,7 @@
 import {ethers} from 'ethers';
-import * as fs from 'fs';
-import * as path from 'path';
 
 import {Logger} from '../helpers/logger/pino';
+import {Base} from './base';
 import {SmartContractSdkCore} from './core/core';
 import {convertSlippage, getFastGasFee, priceMaster} from './utils/helpers';
 
@@ -14,14 +13,11 @@ export interface WeightsData {
   tokenBalance: Number;
   tokenPrice: Number;
 }
-export class FundV2 {
-  constructor(private readonly sdkCore: SmartContractSdkCore) {}
 
-  /**
-   * function to get abi file
-   */
-  async abi(): Promise<string> {
-    return fs.readFileSync(path.join(__dirname, './abi/fundV2.json'), 'utf-8');
+export class FundV2 extends Base {
+  constructor(readonly _sdkCore: SmartContractSdkCore) {
+    super(_sdkCore);
+    this.abiFileLocation = './abi/fundV2.json';
   }
 
   /**
@@ -63,18 +59,6 @@ export class FundV2 {
       Logger.error({error: e, name: FundV2.name}, 'getFundWeightsData error');
       throw e;
     }
-  }
-
-  /**
-   * function to get token decimal
-   *
-   * @param contractAddress the contract address to get.
-   * @returns the number of decimal for the particular contract address.
-   */
-  async getTokenDecimal(contractAddress: string): Promise<number> {
-    const fundV2Abi = await this.abi();
-    const contract = new ethers.Contract(contractAddress, fundV2Abi, this.sdkCore.provider);
-    return Number(await contract.decimals());
   }
 
   /**

@@ -14,8 +14,11 @@ export class Base {
   /**
    * function to get abi file
    */
-  async abi(): Promise<string> {
-    return fs.readFileSync(path.join(__dirname, this.abiFileLocation), 'utf-8');
+  async abi(abiFileLocation?: string): Promise<string> {
+    return fs.readFileSync(
+      path.join(__dirname, abiFileLocation ? abiFileLocation : this.abiFileLocation),
+      'utf-8',
+    );
   }
 
   /**

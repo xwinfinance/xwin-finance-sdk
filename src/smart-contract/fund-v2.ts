@@ -5,13 +5,32 @@ import {Base} from './base';
 import {SmartContractSdkCore} from './core/core';
 import {convertSlippage, getFastGasFee, priceMaster} from './utils/helpers';
 
-export interface WeightsData {
+export interface IWeightsData {
   targetTokenAddress: String;
   targetWeights: Number;
   currentWeights: Number;
   activeWeights: Number;
   tokenBalance: Number;
   tokenPrice: Number;
+}
+
+export interface IFundData {
+  baseCcy: String;
+  targetAddress: String[];
+  totalUnitB4: Number;
+  baseBalance: Number;
+  unitPrice: Number;
+  fundValue: Number;
+  unitPriceUSD: Number;
+  fundValueUSD: Number;
+  fundName: String;
+  symbolName: String;
+  decimal: Number;
+
+  managementFee?: Number;
+  performFee?: Number;
+  mAddr?: String;
+  highWaterMarkPrice?: Number;
 }
 
 export class FundV2 extends Base {
@@ -21,12 +40,74 @@ export class FundV2 extends Base {
   }
 
   /**
+   * function to read fund data info
+   * @param contractAddress the contract address .
+   * @returns the object of fund data.
+   */
+  async getFundDataInfo(contractAddress: string): Promise<IFundData> {
+    try {
+      const fundV2Abi = await this.abi();
+      const contractFundv2 = new ethers.Contract(contractAddress, fundV2Abi, this.sdkCore.provider);
+
+      const fundData = await contractFundv2.GetFundDataAll();
+      const decimal = await this.getTokenDecimal(contractAddress);
+
+      return {
+        baseCcy: fundData.baseCcy,
+        targetAddress: fundData.targetAddress,
+        totalUnitB4: fundData.totalUnitB4,
+        baseBalance: fundData.baseBalance,
+        unitPrice: fundData.unitprice,
+        fundValue: fundData.fundvalue,
+        unitPriceUSD: fundData.unitpriceUSD,
+        fundValueUSD: fundData.fundvalueUSD,
+        fundName: fundData.fundName,
+        symbolName: fundData.symbolName,
+        decimal,
+      };
+    } catch (e) {
+      try {
+        const xWinAllocationAbi = await this.abi('./abi/xWinAllocations.json');
+        const contract = new ethers.Contract(
+          contractAddress,
+          xWinAllocationAbi,
+          this.sdkCore.provider,
+        );
+
+        const data = await contract.GetStrategyData();
+        const decimal = await this.getTokenDecimal(contractAddress);
+
+        return {
+          baseCcy: data.baseCcy,
+          targetAddress: [],
+          totalUnitB4: data.totalUnitB4,
+          baseBalance: data.baseBalance,
+          unitPrice: data.unitprice,
+          fundValue: data.fundvalue,
+          unitPriceUSD: data.unitpriceUSD,
+          fundValueUSD: data.fundvalueUSD,
+          fundName: data.name,
+          symbolName: data.symbol,
+          managementFee: data.managementFee,
+          performFee: data.performFee,
+          mAddr: data.mAddr,
+          highWaterMarkPrice: data.highWaterMarkPrice,
+          decimal,
+        };
+      } catch (e1) {
+        Logger.error({error: e1, name: FundV2.name}, 'getFundDataInfo error');
+        throw e1;
+      }
+    }
+  }
+
+  /**
    * function to read fund active weights
    *
    * @param {Object} param the contract address to deposit.
    * @returns 3 seperate arrays of target weights, current weights, and active weights
    */
-  async getFundWeightsData(contractAddress: string): Promise<WeightsData[]> {
+  async getFundWeightsData(contractAddress: string): Promise<IWeightsData[]> {
     try {
       const fundV2Abi = await this.abi();
       const priceMasterContract = await priceMaster(this.sdkCore.chainId, this.sdkCore.provider);

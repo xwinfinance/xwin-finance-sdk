@@ -27,13 +27,6 @@ export const getFastGasFee = async (chainId: Number): Promise<GasFee> => {
     };
   }
 
-  // BNB Smart Chain Mainnet
-  if (chainId === 56) {
-    return {
-      gasPrice: convertToWei(3),
-    };
-  }
-
   // BNB Smart Chain Testnet
   if (chainId === 97) {
     return {
@@ -53,6 +46,7 @@ export const getFastGasFee = async (chainId: Number): Promise<GasFee> => {
     };
   }
 
+  // BNB Smart Chain Mainnet or other, default to 3 gwei
   return {
     gasPrice: convertToWei(3),
   };
